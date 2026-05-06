@@ -11,7 +11,7 @@
 - 联邦学习主模型：仍使用未压缩本文模型
 
 如果需要复现实验，请直接以 `scratch/06_realtime_emulation/reproduce.md` 为准。为便于快速核对，当前论文采用的正式结果口径概括如下。
-
+数据集下载链接：https://drive.google.com/drive/folders/1-F1WE6XanRqltziRBY7Z38yKhLHx5dS7?usp=drive_link
 ## 正式结果总览
 
 ### 单机主模型结果
