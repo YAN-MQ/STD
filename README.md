@@ -122,8 +122,3 @@ scratch/06_realtime_emulation/
 - 正式压缩入口
 - 正式 Level 1–Level 4B 联邦入口
 
-## 说明
-
-- 本 README 只保留最终正式实验链的项目说明、精简正式结果表与目录结构；
-- 论文正文与 `reproduce.md` 为正式结果与复现命令的权威来源；
-- 历史实验目录与中间结果如果仍保留在 `experiments/` 下，不应视为当前论文正式结果。
