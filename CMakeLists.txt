@@ -7,7 +7,7 @@ build_exec(
     ${libinternet}
     ${libpoint-to-point}
     ${libtap-bridge}
-  EXECUTABLE_DIRECTORY_PATH ${CMAKE_OUTPUT_DIRECTORY}/scratch/06_realtime_emulation
+  EXECUTABLE_DIRECTORY_PATH ${CMAKE_OUTPUT_DIRECTORY}/scratch/STD
 )
 
 build_exec(
@@ -18,7 +18,7 @@ build_exec(
     ${libnetwork}
     ${libinternet}
     ${libpoint-to-point}
-  EXECUTABLE_DIRECTORY_PATH ${CMAKE_OUTPUT_DIRECTORY}/scratch/06_realtime_emulation
+  EXECUTABLE_DIRECTORY_PATH ${CMAKE_OUTPUT_DIRECTORY}/scratch/STD
 )
 
 option(ORBITSHIELD_ENABLE_LIBTORCH_RUNTIME "Enable the experimental libtorch Level 4B runtime target" ON)
@@ -42,18 +42,18 @@ if(ORBITSHIELD_ENABLE_LIBTORCH_RUNTIME)
 
   if(TORCH_FOUND)
     add_executable(
-      scratch_06_realtime_emulation_federated_libtorch_runtime
+      scratch_STD_federated_libtorch_runtime
       federated_libtorch_runtime.cc
     )
 
     string(REPLACE " " ";" ORBITSHIELD_TORCH_CXX_FLAGS "${TORCH_CXX_FLAGS}")
     target_compile_options(
-      scratch_06_realtime_emulation_federated_libtorch_runtime
+      scratch_STD_federated_libtorch_runtime
       PRIVATE
         ${ORBITSHIELD_TORCH_CXX_FLAGS}
     )
     target_link_libraries(
-      scratch_06_realtime_emulation_federated_libtorch_runtime
+      scratch_STD_federated_libtorch_runtime
       PRIVATE
         ${LIB_AS_NEEDED_PRE}
         ${libcore}
@@ -61,13 +61,13 @@ if(ORBITSHIELD_ENABLE_LIBTORCH_RUNTIME)
         ${LIB_AS_NEEDED_POST}
     )
     target_include_directories(
-      scratch_06_realtime_emulation_federated_libtorch_runtime
+      scratch_STD_federated_libtorch_runtime
       PRIVATE
         /home/lithic/final/ns3-gpu-venv/lib/python3.12/site-packages/torch/include
         /home/lithic/final/ns3-gpu-venv/lib/python3.12/site-packages/torch/include/torch/csrc/api/include
     )
     set_target_properties(
-      scratch_06_realtime_emulation_federated_libtorch_runtime
+      scratch_STD_federated_libtorch_runtime
       PROPERTIES
         CXX_STANDARD 23
         BUILD_RPATH "/home/lithic/final/ns3-gpu-venv/lib/python3.12/site-packages/torch/lib"
@@ -75,8 +75,8 @@ if(ORBITSHIELD_ENABLE_LIBTORCH_RUNTIME)
     )
     set_runtime_outputdirectory(
       "federated_libtorch_runtime"
-      "${CMAKE_OUTPUT_DIRECTORY}/scratch/06_realtime_emulation/"
-      "scratch_06_realtime_emulation_"
+      "${CMAKE_OUTPUT_DIRECTORY}/scratch/STD/"
+      "scratch_STD_"
     )
   endif()
 endif()

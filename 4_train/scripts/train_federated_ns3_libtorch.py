@@ -18,7 +18,7 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 from dataset_profiles import get_dataset_profile
 
 
-PROJECT_ROOT = Path("/home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation")
+PROJECT_ROOT = Path("/home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD")
 BUILD_ROOT = PROJECT_ROOT.parent.parent
 TORCH_LIB_DIR = Path("/home/lithic/final/ns3-gpu-venv/lib/python3.12/site-packages/torch/lib")
 TORCH_CMAKE_PREFIX = Path("/home/lithic/final/ns3-gpu-venv/lib/python3.12/site-packages/torch/share/cmake")
@@ -201,7 +201,7 @@ def maybe_build() -> None:
             "--build",
             str(BUILD_ROOT / "build"),
             "--target",
-            "scratch_06_realtime_emulation_federated_libtorch_runtime",
+            "scratch_STD_federated_libtorch_runtime",
             "-j2",
         ],
         cwd=BUILD_ROOT,
@@ -217,7 +217,7 @@ def main() -> None:
     if args.build:
         maybe_build()
 
-    binary = BUILD_ROOT / "build" / "scratch" / "06_realtime_emulation" / "ns3.46.1-federated_libtorch_runtime-optimized"
+    binary = BUILD_ROOT / "build" / "scratch" / "STD" / "ns3.46.1-federated_libtorch_runtime-optimized"
     if not binary.exists():
         raise FileNotFoundError(f"Missing 4B runtime binary: {binary}")
 

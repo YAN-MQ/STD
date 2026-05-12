@@ -27,7 +27,7 @@ Python 依赖准备：
 
 ```bash
 source /home/lithic/final/ns3-gpu-venv/bin/activate
-pip install -r /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train/requirements.txt
+pip install -r /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train/requirements.txt
 ```
 
 输出目录：
@@ -39,9 +39,9 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1
 source /home/lithic/final/ns3-gpu-venv/bin/activate
 
 cmake -S . -B build
-cmake --build build --target scratch_06_realtime_emulation_realtime_satellite -j"$(nproc)"
-cmake --build build --target scratch_06_realtime_emulation_federated_constellation -j"$(nproc)"
-cmake --build build --target scratch_06_realtime_emulation_federated_libtorch_runtime -j"$(nproc)"
+cmake --build build --target scratch_STD_realtime_satellite -j"$(nproc)"
+cmake --build build --target scratch_STD_federated_constellation -j"$(nproc)"
+cmake --build build --target scratch_STD_federated_libtorch_runtime -j"$(nproc)"
 ```
 
 说明：
@@ -57,14 +57,14 @@ cmake --build build --target scratch_06_realtime_emulation_federated_libtorch_ru
 
 项目根目录：
 
-- [06_realtime_emulation](./)
+- [STD](./)
 
 ## 2. 复现 `cicids17` 数据集与本文单体模型
 
 输入目录：
 
 - 原始 PCAP：`/home/lithic/final/data`
-- 项目目录：[06_realtime_emulation](./)
+- 项目目录：[STD](./)
 
 输出目录：
 
@@ -76,7 +76,7 @@ cmake --build build --target scratch_06_realtime_emulation_federated_libtorch_ru
 从原始 PCAP 完整生成 `cicids17` 数据集并训练本文单体模型：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD
 export PATH="/home/lithic/final/ns3-gpu-venv/bin:$PATH"
 /home/lithic/final/ns3-gpu-venv/bin/python -c "import scapy"
 MAX_PACKETS=50000 sudo -E bash ./run_all_window.sh
@@ -85,7 +85,7 @@ MAX_PACKETS=50000 sudo -E bash ./run_all_window.sh
 如果只想重跑本文单体训练：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 ./run_train.sh
 ```
 
@@ -113,14 +113,14 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 先生成 `STI` 的 `npz` 数据：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD
 /home/lithic/final/ns3-gpu-venv/bin/python 3_prepare_sti_dataset.py
 ```
 
 训练 `STI` 本文单体模型：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_gru.py --dataset sti --device cuda --hidden_dim 32 --dropout 0.4 --conv_dim 16 --dsc_dim 48 --lr 0.0003 --weight_decay 0.01 --epochs 100 --batch_size 128 --early_stopping_patience 10 --no-bidirectional --output_dir checkpoints_gru_formal_tuned
 ```
 
@@ -134,14 +134,14 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 正式模型对比：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/run_comparison.py --output_dir experiments/comparison_formal_tuned --include_traditional --device cuda
 ```
 
 正式消融：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 ./run_ablation.sh --output_dir experiments/ablation_formal_tuned --comparison_config experiments/comparison_formal_tuned/comparison_results.json
 ```
 
@@ -162,6 +162,17 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 
 给出，当前正式压缩模型已满足参数量、CPU时延和精度三项验收条件。
 
+正式结构化压缩复现命令：
+
+```bash
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
+/home/lithic/final/ns3-gpu-venv/bin/python scripts/run_structured_compression_candidates.py \
+  --output_dir experiments/compression/structured_candidates_formal_tuned \
+  --device cuda
+/home/lithic/final/ns3-gpu-venv/bin/python scripts/select_structured_compression_winner.py \
+  --candidates_dir experiments/compression/structured_candidates_formal_tuned
+```
+
 ## 6. 复现 `OrbitShield_FL` Level 1 正式结果
 
 正式输出目录：
@@ -172,14 +183,14 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 `cicids17`：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated.py --dataset cicids17 --device cuda --output_dir experiments/OrbitShield_FL_formal_tuned/cicids17 --init_checkpoint checkpoints_gru_formal_tuned/cicids17_gru_best.pt --hidden_dim 32 --dropout 0.4 --conv_dim 16 --dsc_dim 48
 ```
 
 `sti`：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated.py --dataset sti --device cuda --output_dir experiments/OrbitShield_FL_formal_tuned/sti --init_checkpoint checkpoints_gru_formal_tuned/sti_gru_best.pt --hidden_dim 32 --dropout 0.4 --conv_dim 16 --dsc_dim 48 --full_eval
 ```
 
@@ -194,7 +205,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 `cicids17`：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated_ns3.py \
   --dataset cicids17 \
   --trace_dir experiments/OrbitShield_FL_ns3/cicids17_trace \
@@ -210,7 +221,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 `sti`：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated_ns3.py \
   --dataset sti \
   --trace_dir experiments/OrbitShield_FL_ns3/sti_trace \
@@ -233,7 +244,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 `cicids17`：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated_ns3_online.py \
   --dataset cicids17 \
   --rounds 20 \
@@ -249,7 +260,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 `sti`：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated_ns3_online.py \
   --dataset sti \
   --rounds 20 \
@@ -273,7 +284,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 `cicids17`：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated_ns3_libtorch.py \
   --dataset cicids17 \
   --rounds 20 \
@@ -291,7 +302,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 `sti`：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated_ns3_libtorch.py \
   --dataset sti \
   --rounds 20 \

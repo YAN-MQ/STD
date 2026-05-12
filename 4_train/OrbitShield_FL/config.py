@@ -67,7 +67,7 @@ class FederatedConfig:
     topology_backend: str = "heuristic"
     ns3_trace_dir: str | None = None
     ns3_binary: str = (
-        "/home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/build/scratch/06_realtime_emulation/"
+        "/home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/build/scratch/STD/"
         "ns3.46.1-federated_constellation-optimized"
     )
     ns3_round_duration: float = 30.0

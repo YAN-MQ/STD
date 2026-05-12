@@ -1,28 +1,30 @@
 #!/usr/bin/env python3
-"""Train OrbitShield_FL with Level 3 online ns-3 co-simulation."""
+"""Train OrbitShield_FL with an ns-3-driven communication topology backend."""
 
 from __future__ import annotations
 
 import argparse
 import os
 import sys
+from pathlib import Path
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from dataset_profiles import get_dataset_profile
-from OrbitShield_FL import FederatedConfig, run_online_federated_training
+from OrbitShield_FL import FederatedConfig, run_federated_training
+from OrbitShield_FL.ns3_bridge import load_ns3_trace_bundle, run_federated_constellation
 from train_federated import resolve_method_hparams, resolve_runtime_defaults
 
 
 DEFAULT_NS3_BINARY = (
-    "/home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/build/scratch/06_realtime_emulation/"
+    "/home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/build/scratch/STD/"
     "ns3.46.1-federated_constellation-optimized"
 )
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse CLI arguments for Level 3 online co-simulation."""
-    parser = argparse.ArgumentParser(description="OrbitShield_FL Level 3 online ns-3 co-simulation training")
+    """Parse CLI arguments for the ns-3-driven federated trainer."""
+    parser = argparse.ArgumentParser(description="OrbitShield_FL federated training with ns-3 topology traces")
 
     common = parser.add_argument_group("common")
     common.add_argument("--dataset", choices=["cicids17", "sti"], default="cicids17")
@@ -38,12 +40,14 @@ def parse_args() -> argparse.Namespace:
     common.add_argument("--full_eval", action="store_true")
     common.add_argument("--from_scratch", action="store_true")
 
-    online = parser.add_argument_group("online_ns3")
-    online.add_argument("--ns3_binary", default=DEFAULT_NS3_BINARY)
-    online.add_argument("--round_duration", type=float, default=30.0)
-    online.add_argument("--contact_period", type=int, default=4)
-    online.add_argument("--contact_duration_rounds", type=int, default=2)
-    online.add_argument("--reuse_round_trace", action="store_true", help="Reuse generated per-round traces if they already exist")
+    ns3_group = parser.add_argument_group("ns3")
+    ns3_group.add_argument("--trace_dir", default=None, help="Use an existing ns-3 trace directory")
+    ns3_group.add_argument("--generate_trace", action="store_true", help="Generate a fresh trace before training")
+    ns3_group.add_argument("--ns3_binary", default=DEFAULT_NS3_BINARY)
+    ns3_group.add_argument("--trace_output_dir", default=None)
+    ns3_group.add_argument("--round_duration", type=float, default=30.0)
+    ns3_group.add_argument("--contact_period", type=int, default=4)
+    ns3_group.add_argument("--contact_duration_rounds", type=int, default=2)
 
     advanced = parser.add_argument_group("advanced")
     advanced.add_argument("--data_dir", default=None, help=argparse.SUPPRESS)
@@ -76,27 +80,73 @@ def parse_args() -> argparse.Namespace:
 
 
 def resolve_output_dir(dataset_name: str, explicit_output_dir: str | None) -> str:
-    """Resolve the formal default output directory for Level 3 training."""
+    """Resolve the default output directory for ns-3-driven training."""
     if explicit_output_dir:
         return explicit_output_dir
     if dataset_name == "cicids17":
-        return "experiments/OrbitShield_FL_ns3_online/cicids17"
-    return f"experiments/OrbitShield_FL_ns3_online/{dataset_name}"
+        return "experiments/OrbitShield_FL_ns3/cicids17"
+    return f"experiments/OrbitShield_FL_ns3/{dataset_name}"
+
+
+def resolve_default_trace_output_dir(dataset_name: str) -> str:
+    """Resolve the formal default trace directory for ns-3-driven training."""
+    if dataset_name == "cicids17":
+        return "experiments/OrbitShield_FL_ns3/cicids17_trace"
+    return f"experiments/OrbitShield_FL_ns3/{dataset_name}_trace"
+
+
+def resolve_trace_dir(args: argparse.Namespace, output_dir: str) -> str:
+    """Resolve or generate the ns-3 trace directory used by this run."""
+    if args.trace_dir:
+        bundle = load_ns3_trace_bundle(args.trace_dir)
+        if len(bundle.rounds) < args.rounds:
+            raise ValueError(
+                f"Trace directory {bundle.trace_dir} contains only {len(bundle.rounds)} rounds, "
+                f"but {args.rounds} are required"
+            )
+        return str(bundle.trace_dir)
+
+    trace_dir = args.trace_output_dir or resolve_default_trace_output_dir(args.dataset)
+    if args.generate_trace or not Path(trace_dir).exists():
+        bundle = run_federated_constellation(
+            binary_path=args.ns3_binary,
+            output_dir=trace_dir,
+            num_planes=args.num_planes,
+            sats_per_plane=args.num_clients // args.num_planes,
+            rounds=args.rounds,
+            round_duration=args.round_duration,
+            seed=args.seed,
+            extra_args=[
+                f"--contact-period={args.contact_period}",
+                f"--contact-duration-rounds={args.contact_duration_rounds}",
+            ],
+        )
+        return str(bundle.trace_dir)
+
+    bundle = load_ns3_trace_bundle(trace_dir)
+    if len(bundle.rounds) < args.rounds:
+        raise ValueError(
+            f"Trace directory {bundle.trace_dir} contains only {len(bundle.rounds)} rounds, "
+            f"but {args.rounds} are required"
+        )
+    return str(bundle.trace_dir)
 
 
 def main() -> None:
-    """Run Level 3 online co-simulation federated training."""
+    """Run federated training using ns-3-generated topology traces."""
     args = parse_args()
     profile = get_dataset_profile(args.dataset)
     runtime_defaults = resolve_runtime_defaults(args, profile.name)
     method_hparams = resolve_method_hparams(args)
     output_dir = resolve_output_dir(profile.name, args.output_dir)
+    trace_dir = resolve_trace_dir(args, output_dir)
 
     config = FederatedConfig(
         dataset=args.dataset,
         data_dir=args.data_dir or profile.data_dir,
         output_dir=output_dir,
-        topology_backend="ns3_online",
+        topology_backend="ns3",
+        ns3_trace_dir=trace_dir,
         method=args.method,
         num_clients=args.num_clients,
         num_planes=args.num_planes,
@@ -131,19 +181,14 @@ def main() -> None:
         class_names=profile.class_names,
         seed=args.seed,
         device=args.device,
-        ns3_binary=args.ns3_binary,
-        ns3_round_duration=args.round_duration,
-        ns3_force_regenerate=not args.reuse_round_trace,
-        inter_plane_contact_period=args.contact_period,
-        inter_plane_contact_duration=args.contact_duration_rounds,
     )
 
-    result = run_online_federated_training(config)
+    result = run_federated_training(config)
     print("=" * 60)
-    print("OrbitShield_FL Level 3 Online Co-Simulation Finished")
+    print("OrbitShield_FL ns-3 Training Finished")
     print("=" * 60)
     print(f"Dataset     : {profile.name}")
-    print(f"Output dir  : {output_dir}")
+    print(f"Trace dir   : {trace_dir}")
     print(f"Best model  : {result['best_model_path']}")
     print(f"Best val accuracy: {result['best_val_accuracy']:.4f}")
     final_metrics = result["final_test_metrics"]

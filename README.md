@@ -1,6 +1,6 @@
 # 面向低轨卫星网络的轻量化星上AI威胁预测模型
 
-围绕低轨卫星网络中的短窗口威胁预测任务，完成了从数据构建、单体模型训练、联邦学习到部署评估的正式实验链路。
+本科毕业设计项目，围绕低轨卫星网络中的短窗口威胁预测任务，完成了从数据构建、单体模型训练、联邦学习到部署评估的正式实验链路。
 
 ## 项目说明
 
@@ -10,8 +10,8 @@
 - 正式压缩 / 部署口径：结构化压缩模型（结构化压缩 + 短程微调 + `fbgemm` 动态INT8）
 - 联邦学习主模型：仍使用未压缩本文模型
 
-如果需要复现实验，请直接以 `scratch/06_realtime_emulation/reproduce.md` 为准。为便于快速核对，当前论文采用的正式结果口径概括如下。
-数据集下载链接：https://drive.google.com/drive/folders/1-F1WE6XanRqltziRBY7Z38yKhLHx5dS7?usp=drive_link
+如果需要复现实验，请直接以 `scratch/STD/reproduce.md` 为准。为便于快速核对，当前论文采用的正式结果口径概括如下。
+
 ## 正式结果总览
 
 ### 单机主模型结果
@@ -68,7 +68,7 @@
 ## 最终正式实验链目录结构
 
 ```text
-scratch/06_realtime_emulation/
+scratch/STD/
 ├── fragments_window/                              # 正式数据构建阶段的分片后 PCAP
 ├── captured_window/                               # ns-3 回放后的正式抓包输出
 ├── dataset_cicids17/                              # 正式 cicids17 数据集
@@ -113,7 +113,7 @@ scratch/06_realtime_emulation/
 ## 正式复现入口
 
 请直接参考：
-- `scratch/06_realtime_emulation/reproduce.md`
+- `scratch/STD/reproduce.md`
 
 其中包含：
 - 本文模型训练入口
@@ -122,3 +122,8 @@ scratch/06_realtime_emulation/
 - 正式压缩入口
 - 正式 Level 1–Level 4B 联邦入口
 
+## 说明
+
+- 本 README 只保留最终正式实验链的项目说明、精简正式结果表与目录结构；
+- 论文正文与 `reproduce.md` 为正式结果与复现命令的权威来源；
+- 历史实验目录与中间结果如果仍保留在 `experiments/` 下，不应视为当前论文正式结果。

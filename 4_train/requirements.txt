@@ -1,6 +1,6 @@
 # LEO Satellite Network Threat Detection
 
-Requirements for training DSC-CBAM-LSTM models.
+# Requirements for training DSC-CBAM-LSTM models.
 
 # Core
 torch>=1.9.0

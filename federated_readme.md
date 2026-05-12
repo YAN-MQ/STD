@@ -678,7 +678,7 @@
 ### 17.1 默认运行正式联邦版本
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 ./scripts/run_federated.sh
 ```
 
@@ -694,7 +694,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 ### 17.3 重绘调参图
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/plot_federated_grid_search.py \
   --csv_path experiments/OrbitShield_FL/grid_search/grid_search_summary.csv \
   --output_dir experiments/OrbitShield_FL/grid_search/plots
@@ -716,7 +716,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 实际运行命令如下：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated.py \
   --dataset sti \
   --method full \
@@ -919,7 +919,7 @@ ns-3 驱动联邦协同仿真新增了以下模块：
 ### 25.1 使用已有 trace 训练
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated_ns3.py \
   --dataset cicids17 \
   --trace_dir experiments/OrbitShield_FL_ns3/cicids17_trace \
@@ -932,7 +932,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 ### 25.2 训练前自动生成 trace
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 /home/lithic/final/ns3-gpu-venv/bin/python scripts/train_federated_ns3.py \
   --dataset cicids17 \
   --rounds 5 \
@@ -1153,7 +1153,7 @@ cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/
 复现命令：
 
 ```bash
-cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/06_realtime_emulation/4_train
+cd /home/lithic/final/ns3/ns-3-allinone/ns-3.46.1/scratch/STD/4_train
 ./scripts/run_federated_ns3_libtorch.sh
 ```
 
