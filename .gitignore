@@ -42,6 +42,9 @@ experiments/
 4_train/libtorch_data/
 4_train/libtorch_init/
 4_train/checkpoints*/
+docs/
+work.md
+issue.md
 
 # Legacy generic names
 fragments/
